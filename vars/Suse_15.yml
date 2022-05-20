@@ -1,0 +1,15 @@
+---
+podman_install_python_cmd: "zypper -n install --no-recommends python3"
+podman_pkg_manager: zypper
+podman_base_pkg_groups_default:
+  - enhanced_base
+podman_base_pkgs_default:
+  - ca-certificates
+  - ca-certificates-cacert
+  - ca-certificates-mozilla
+  - glibc-i18ndata
+  - insserv-compat
+  - kernel-default
+  - python
+  - python-xml
+  - timezone

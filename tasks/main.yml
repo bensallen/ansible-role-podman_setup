@@ -1,0 +1,74 @@
+---
+- block: 
+  - name: Gather facts from podman_build_host
+    setup:
+    delegate_facts: true
+
+  - name: Copy needed facts podman_build_host
+    set_fact:
+      ansible_os_family: "{{hostvars[podman_build_host]['ansible_os_family']}}"
+      ansible_date_time: "{{hostvars[podman_build_host]['ansible_date_time']}}"
+      ansible_distribution: "{{hostvars[podman_build_host]['ansible_distribution']}}"
+      ansible_distribution_version: "{{hostvars[podman_build_host]['ansible_distribution_version']}}"
+      ansible_distribution_major_version: "{{hostvars[podman_build_host]['ansible_distribution_major_version']}}"
+      ansible_architecture: "{{hostvars[podman_build_host]['ansible_architecture']}}"
+
+  - name: Override facts
+    set_fact: "{{ item.key }}={{ item.value }}"
+    when: item.value is defined and item.value != ""
+    with_items: "{{ podman_fact_override|dict2items }}"
+
+  - name: Set OS dependent variables
+    include_vars: "{{lookup('first_found', params)}}"
+    vars:
+      params:
+        files:
+          - "{{ ansible_distribution }}_{{ ansible_distribution_major_version }}.yml"
+          - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yml"
+        paths:
+          - 'vars'
+
+  - name: Pull image
+    podman_image:
+      name: "{{ podman_base_image }}"
+      tag: "{{ podman_base_image_tag }}"
+  
+  # Use an init here as sleep doesn't handle signals and thus won't
+  # exit from SIGTERM
+  - name: Run container from base set to sleep for later podman connections
+    containers.podman.podman_container:
+      name: "{{ podman_working_name }}"
+      image: "{{ podman_base_image }}:{{podman_base_image_tag }}"
+      init: yes
+      command: /usr/bin/sleep infinity
+  delegate_to: "{{ podman_build_host }}"
+
+- name: Override the podman container name
+  set_fact:
+    ansible_host: "{{ podman_working_name }}"
+
+- name: Ensure Python is installed
+  raw: "{{ podman_install_python_cmd }}"
+
+# Run package manager specific tasks
+- include_tasks: "{{ podman_pkg_manager }}.yml"
+
+- block:
+  - name: Stop container
+    containers.podman.podman_container:
+      name: "{{ podman_working_name }}"
+      state: stopped
+  - name: Commit base container
+    command: podman container commit "{{ podman_working_name }}" "{{ podman_target_name }}_setup:{{ podman_rev }}"
+  - name: Cleanup intermediate container
+    containers.podman.podman_container:
+      name: "{{ podman_working_name }}"
+      state: absent
+  - name: Run container with systemd as init
+    containers.podman.podman_container:
+      name: "{{ podman_working_name }}"
+      image: "{{ podman_target_name }}_setup:{{ podman_rev }}"
+      command: /usr/sbin/init
+      state: started
+  when: podman_restart_container_with_systemd|bool
+  delegate_to: "{{ podman_build_host }}"

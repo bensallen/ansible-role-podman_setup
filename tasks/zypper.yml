@@ -1,0 +1,10 @@
+---
+
+- name: Install podman_base_pkg_groups and podman_base_pkgs into container
+  zypper:
+    name: "{{ item.name }}"
+    type: "{{ item.type }}"
+  environment: "{{ podman_proxy_env }}"
+  with_items:
+    - { type: "pattern", name: "{{ podman_base_pkg_groups }}" }
+    - { type: "package", name: "{{ podman_base_pkgs }}" }

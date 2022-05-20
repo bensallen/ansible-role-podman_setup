@@ -1,0 +1,28 @@
+---
+# Upstream image to start the build with
+podman_base_image: ""
+# Upstream image tag to start the build with
+podman_base_image_tag: ""
+
+# Packages to add to the base image
+podman_base_pkgs: "{{ podman_base_pkgs_default }}"
+
+# Package groups/patterns to add to the base image
+podman_base_pkg_groups: "{{ podman_base_pkg_groups_default }}"
+
+# Name of the container
+podman_target_name: "{{ inventory_hostname }}"
+
+# Git short hash of the parent Ansible project
+podman_git_ref: ""
+
+podman_rev: "{{ ansible_date_time.iso8601_basic_short }}_{{ podman_git_ref }}"
+
+podman_working_name: "{{ podman_target_name }}_{{ podman_rev }}"
+
+podman_build_host: localhost
+
+podman_restart_container_with_systemd: true
+
+podman_proxy_env: {}
+
