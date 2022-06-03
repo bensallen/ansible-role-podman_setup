@@ -41,6 +41,7 @@
       image: "{{ podman_base_image }}:{{podman_base_image_tag }}"
       init: yes
       command: /usr/bin/sleep infinity
+      env: "{{ podman_proxy_env }}"
   delegate_to: "{{ podman_build_host }}"
 
 - name: Override the podman container name
@@ -70,5 +71,6 @@
       image: "{{ podman_target_name }}_setup:{{ podman_rev }}"
       command: /usr/sbin/init
       state: started
+      env: "{{ podman_proxy_env }}"
   when: podman_restart_container_with_systemd|bool
   delegate_to: "{{ podman_build_host }}"

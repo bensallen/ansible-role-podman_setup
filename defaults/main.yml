@@ -16,9 +16,9 @@ podman_target_name: "{{ inventory_hostname }}"
 # Git short hash of the parent Ansible project
 podman_git_ref: ""
 
-podman_rev: "{{ ansible_date_time.iso8601_basic_short }}_{{ podman_git_ref }}"
+podman_rev: "{{ ansible_date_time.iso8601_basic_short }}-{{ podman_git_ref }}"
 
-podman_working_name: "{{ podman_target_name }}_{{ podman_rev }}"
+podman_working_name: "{{ podman_target_name }}-{{ podman_rev }}"
 
 podman_build_host: localhost
 
