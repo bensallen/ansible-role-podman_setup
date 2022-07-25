@@ -40,6 +40,7 @@
       name: "{{ podman_working_name }}"
       image: "{{ podman_base_image }}:{{podman_base_image_tag }}"
       init: yes
+      no_hosts: True
       command: /usr/bin/sleep infinity
       env: "{{ podman_proxy_env }}"
   delegate_to: "{{ podman_build_host }}"
@@ -69,6 +70,7 @@
     containers.podman.podman_container:
       name: "{{ podman_working_name }}"
       image: "{{ podman_target_name }}_setup:{{ podman_rev }}"
+      no_hosts: True
       command: /usr/sbin/init
       state: started
       env: "{{ podman_proxy_env }}"
