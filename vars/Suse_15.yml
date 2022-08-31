@@ -10,6 +10,4 @@ podman_base_pkgs_default:
   - glibc-i18ndata
   - insserv-compat
   - kernel-default
-  - python
-  - python-xml
   - timezone
