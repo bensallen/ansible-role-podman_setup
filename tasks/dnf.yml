@@ -1,0 +1,25 @@
+---
+
+- name: Install podman_base_pkgs into container in Rocky
+  dnf:
+    name: "{{ item }}"
+  environment: "{{ podman_proxy_env }}"
+  with_items:
+    - "{{ podman_base_pkgs_default }}" 
+
+- name: find kernel path
+  shell: find /boot -type f -name linux
+  register: kernel_src_path
+
+- name: find kernel version
+  shell: find /boot -name linux|cut -d '/' -f 4
+  register: kernel_version
+
+- name: Make link for kernel
+  file:
+    src: "{{ kernel_src_path.stdout }}"
+    dest: "/boot/vmlinuz-{{ kernel_version.stdout }}"
+    state: hard
+
+- name: Make initramfs
+  shell: dracut --kver {{ kernel_version.stdout }}
