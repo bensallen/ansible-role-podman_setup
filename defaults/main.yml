@@ -26,3 +26,8 @@ podman_restart_container_with_systemd: true
 
 podman_proxy_env: {}
 
+podman_registry_auth: False
+podman_registry: ""
+podman_registry_login: ""
+podman_registry_password: ""
+

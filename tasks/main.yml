@@ -29,6 +29,13 @@
         paths:
           - 'vars'
 
+  - name: Login to registry if needed
+    containers.podman.podman_login:
+      username: "{{ podman_registry_login }}"
+      password: "{{ podman_registry_password }}"
+      registry: "{{ podman_registry }}"
+    when: podman_registry_auth|bool
+
   - name: Pull image
     podman_image:
       name: "{{ podman_base_image }}"
