@@ -1,0 +1,17 @@
+---
+podman_install_python_cmd: "/usr/bin/true"
+podman_pkg_manager: dnf
+
+podman_base_pkgs_default:
+  - ca-certificates
+  - dnf
+  - kernel
+  - kernel-headers
+  - openssh
+  - procps-ng
+  - python3-lxml
+  - yum
+  - dnf-command(config-manager)
+podman_base_pkg_groups_default: []
+kernel_version_path: "/lib/modules"
+kernel_version_search: "vmlinuz"
